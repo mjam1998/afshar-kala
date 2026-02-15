@@ -1,0 +1,10 @@
+{
+    "vazir": {
+        "normal": "C:\\laragon\\www\\AfsharKala\\storage\\fonts\/vazir_normal_03820c2190c564644edabd39eda36f38",
+        "bold": "vazir_bold_bc7e964553bf7704427c190f1fd9e5d2"
+    },
+    "vazirmatn": {
+        "normal": "C:\\laragon\\www\\AfsharKala\\storage\\fonts\/vazirmatn_normal_223d6e632fae6d6557ddf06a112d258c",
+        "bold": "vazirmatn_bold_bc7e964553bf7704427c190f1fd9e5d2"
+    }
+}

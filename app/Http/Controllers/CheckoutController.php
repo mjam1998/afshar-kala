@@ -171,7 +171,9 @@ class CheckoutController extends Controller
         if ($response['result']==100) {
             $offerCode = session('applied_offer.code');
             $offer = Offer::where('code', $offerCode)->first();
-
+            if($offer){
+                $offerId = $offer->id;
+            }
 
             $trackId=$response['trackId'];
             $order = Order::query()->create([
@@ -187,7 +189,7 @@ class CheckoutController extends Controller
                 'postal_code' => $request['postal_code'],
 
                 'id_get' => $trackId,
-                'offer_id'=>$offer->id
+                'offer_id'=>$offerId ?? null,
 
             ]);
 
@@ -264,75 +266,75 @@ class CheckoutController extends Controller
         ]);
 
 
-          if($response['result']==100 && $response['status']==1 && $response['amount']==$order->pay_amount * 10 ){
+        if($response['result']==100 && $response['status']==1 && $response['amount']==$order->pay_amount * 10 ){
 
-             $order->update([
-                 'trans_id'=>$response['refNumber'],
-                 'is_paid'=>1,
-                 'status'=>2,
-                 'paid_at'=>now(),
-                 'track_number'=>$trackingCode
-             ]);
-             $admin=User::query()->where('type',1)->first();
+            $order->update([
+                'trans_id'=>$response['refNumber'],
+                'is_paid'=>1,
+                'status'=>2,
+                'paid_at'=>now(),
+                'track_number'=>$trackingCode
+            ]);
+            $admin=User::query()->where('type',1)->first();
 
 
-              //پیامک به ادمین
-              Http::withOptions([
-                  'verify' => false,
-              ])->withHeaders([
-                  'Content-Type' => 'application/json',
-                  'Accept' => 'text/plain',
-                  'x-api-key' => env('SMS_IR_API_KEY')
-              ])->post('https://api.sms.ir/v1/send/verify', [
-                  "mobile" => $admin->mobile,
-                  "templateId" => 622998,
-                  "parameters" => [
-                      [
-                          "name" => "TRACNUM",
-                          "value" => $trackingCode
-                      ]
-                  ]
-              ]);
+            //پیامک به ادمین
+            Http::withOptions([
+                'verify' => false,
+            ])->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'text/plain',
+                'x-api-key' => env('SMS_IR_API_KEY')
+            ])->post('https://api.sms.ir/v1/send/verify', [
+                "mobile" => $admin->mobile,
+                "templateId" => 622998,
+                "parameters" => [
+                    [
+                        "name" => "TRACNUM",
+                        "value" => $trackingCode
+                    ]
+                ]
+            ]);
 
-              //پیامک به مشتری
-              Http::withOptions([
-                  'verify' => false,
-              ])->withHeaders([
-                  'Content-Type' => 'application/json',
-                  'Accept' => 'text/plain',
-                  'x-api-key' => env('SMS_IR_API_KEY')
-              ])->post('https://api.sms.ir/v1/send/verify', [
-                  "mobile" => $order->mobile,
-                  "templateId" => 833510,
-                  "parameters" => [
-                      [
-                          "name" => "NAME",
-                          "value" => $order->name
-                      ],[
-                          "name" => "TRACKNUM",
-                          "value" => $trackingCode
-                      ],[
-                          "name" => "AMOUNT",
-                          "value" => number_format($order->pay_amount)
-                      ]
-                  ]
-              ]);
-              foreach ($order->items as $item) {
-                  ProductVariant::query()->where([
-                      'product_id' => $item->product_id,
-                      'color_id'   => $item->product_color_id,
-                      'size_id'    => $item->product_size_id,
-                  ])->decrement('count', $item['quantity']);
-              }
+            //پیامک به مشتری
+            Http::withOptions([
+                'verify' => false,
+            ])->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'text/plain',
+                'x-api-key' => env('SMS_IR_API_KEY')
+            ])->post('https://api.sms.ir/v1/send/verify', [
+                "mobile" => $order->mobile,
+                "templateId" => 833510,
+                "parameters" => [
+                    [
+                        "name" => "NAME",
+                        "value" => $order->name
+                    ],[
+                        "name" => "TRACKNUM",
+                        "value" => $trackingCode
+                    ],[
+                        "name" => "AMOUNT",
+                        "value" => number_format($order->pay_amount)
+                    ]
+                ]
+            ]);
+            foreach ($order->items as $item) {
+                ProductVariant::query()->where([
+                    'product_id' => $item->product_id,
+                    'color_id'   => $item->product_color_id,
+                    'size_id'    => $item->product_size_id,
+                ])->decrement('count', $item['quantity']);
+            }
 
-             return redirect()->route('checkout.payment.result',['track'=>$trackingCode]);
-          }
+            return redirect()->route('checkout.payment.result',['track'=>$trackingCode]);
+        }
 
-          $order->update([
-              'is_paid'=>0,
-              'paid_at'=>now(),
-              'track_number'=>$trackingCode
-          ]);
+        $order->update([
+            'is_paid'=>0,
+            'paid_at'=>now(),
+            'track_number'=>$trackingCode
+        ]);
         return redirect()->route('checkout.payment.result',['track'=>$trackingCode]);
     }
 

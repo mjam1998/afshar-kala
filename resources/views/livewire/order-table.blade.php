@@ -133,6 +133,11 @@
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title">جزئیات سفارش #{{ $order->id }} - کد پیگیری: {{ $order->track_number }}</h5>
+                        <a href="{{ route('admin.order.invoice-pdf', $order) }}"
+                           class="btn btn-light btn-sm me-2"
+                           target="_blank">
+                            <i class="bi bi-file-pdf"></i> دانلود فاکتور PDF
+                        </a>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">

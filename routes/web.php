@@ -75,6 +75,10 @@ Route::prefix('/admin')->middleware('auth')->group(function(){
     Route::get('/product/{product}/variants', [ProductController::class, 'indexVariant'])->name('admin.product.variants.index');
     Route::post('/product/variant/store', [ProductController::class, 'storeVariant'])->name('admin.product.variant.store');
     Route::put('/product/variant/{variant}', [ProductController::class, 'updateVariant'])->name('admin.product.variant.update');
+
+    Route::get('order/{order}/invoice-pdf', [OrderController::class, 'generateInvoicePdf'])
+        ->name('admin.order.invoice-pdf');
+
     Route::prefix('product/{product}')->group(function () {
         Route::get('/comments', [ProductController::class, 'comments'])->name('admin.product.comments');
         Route::post('/comment/store', [ProductController::class, 'storeComment'])->name('admin.product.comment.store');
