@@ -48,7 +48,8 @@ class CategoryController extends Controller
         ]);
 
         $photoExtension = $request->photo->getClientOriginalExtension();
-        $photoName = $request->slug .'.' . $photoExtension;
+        $photoName = $request->slug . '-' . time() . '.' . $photoExtension;
+
         $request->photo->storeAs('category', $photoName, 'public');
 
         Category::create([
@@ -107,7 +108,8 @@ class CategoryController extends Controller
                 unlink(public_path('category/' . $category->photo));
             }
             $photoExtension = $request->photo->getClientOriginalExtension();
-            $photoName = $request->slug .'.' . $photoExtension;
+            $photoName = $request->slug . '-' . time() . '.' . $photoExtension;
+
             $request->photo->storeAs('category', $photoName, 'public');
             $data['photo'] = $photoName;
         }

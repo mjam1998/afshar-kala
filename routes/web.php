@@ -10,6 +10,7 @@ use App\Http\Controllers\OffersController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SendController;
+use App\Http\Controllers\TorobController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -41,6 +42,11 @@ Route::get('/contact-us', [HomeController::class, 'contactUs'])->name('front.con
 Route::get('/rules', [HomeController::class, 'rules'])->name('front.rules');
 Route::post('/cart/apply-offer', [OffersController::class, 'applyOffer'])->name('cart.apply.offer');
 Route::post('/cart/remove-offer', [OffersController::class, 'removeOffer'])->name('cart.remove.offer');
+
+Route::prefix('torob')->group(function () {
+    Route::get('/products', [TorobController::class, 'products'])->name('torob.products');
+    Route::get('/product/{id}', [TorobController::class, 'product'])->name('torob.product');
+});
 
 Route::prefix('/admin')->middleware('auth')->group(function(){
     Route::get('/index',[AdminController::class,'index'])->name('admin.index');

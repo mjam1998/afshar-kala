@@ -10,7 +10,9 @@ class ProductVariant extends Model
       'product_id',
       'size_id',
       'color_id',
-      'count'
+      'count',
+        'price',
+        'discount',
     ];
     public function product()
     {

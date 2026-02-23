@@ -37,14 +37,7 @@
 
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label >قیمت( تومان)</label>
-                        <input type="text" class="form-control moneyDisplay"  >
 
-                        <input type="hidden" class="moneyValue" name="price">
-                    </div>
-                </div>
 
             </div>
             <div class="row mt-4">
@@ -68,15 +61,7 @@
 
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label  class="control-label" >میزان تخفیف(تومان)</label>
 
-                        <input type="text" class=" moneyDisplay form-control "  placeholder="میتواند خالی باشد" >
-
-                        <input type="hidden" class="moneyValue" name="discount">
-                    </div>
-                </div>
 
             </div>
 

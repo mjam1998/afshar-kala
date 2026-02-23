@@ -57,17 +57,7 @@
 
 
                             </div>
-                            <!-- قیمت و تخفیف -->
-                            <div class="col-md-6">
-                                <label>قیمت (تومان)</label>
-                                <input type="text" class="form-control moneyDisplay" id="edit_price_display">
-                                <input type="hidden" class="moneyValue" name="price" id="edit_price">
-                            </div>
-                            <div class="col-md-6">
-                                <label>میزان تخفیف (تومان) - اختیاری</label>
-                                <input type="text" class="form-control moneyDisplay" id="edit_discount_display">
-                                <input type="hidden" class="moneyValue" name="discount" id="edit_discount">
-                            </div>
+
 
                             <!-- دسته‌بندی و تعداد موجودی -->
                             <div class="col-md-4">
@@ -317,6 +307,23 @@
                                         <label class="form-label">تعداد موجودی</label>
                                         <input type="number" class="form-control" name="count" min="0" value="1" required>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label >قیمت( تومان)</label>
+                                            <input type="text" class="form-control moneyDisplay"  >
+
+                                            <input type="hidden" class="moneyValue" name="price">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label  class="control-label" >میزان تخفیف(تومان)</label>
+
+                                            <input type="text" class=" moneyDisplay form-control "  placeholder="میتواند خالی باشد" >
+
+                                            <input type="hidden" class="moneyValue" name="discount">
+                                        </div>
+                                    </div>
                                     <div class="col-md-1 d-flex align-items-end">
                                         <button type="submit" class="btn btn-success w-100">افزودن</button>
                                     </div>
@@ -336,6 +343,8 @@
                                 <th style="width: 100px;">رنگ</th>
                                 <th style="width: 100px;">سایز</th>
                                 <th style="width: 150px;">موجودی فعلی</th>
+                                <th style="width: 150px;">قیمت فعلی</th>
+                                <th style="width: 150px;">تخفیف فعلی</th>
                                 <th style="width: 100px;">عملیات</th>
                             </tr>
                             </thead>
@@ -409,13 +418,7 @@
             document.getElementById('edit_slug').value = product.slug;
             document.getElementById('edit_is_special').value = product.is_special;
 
-            let price = product.price || 0;
-            document.getElementById('edit_price').value = price;
-            document.getElementById('edit_price_display').value = formatNumber(price);
 
-            let discount = product.discount || 0;
-            document.getElementById('edit_discount').value = discount;
-            document.getElementById('edit_discount_display').value = formatNumber(discount);
 
             document.getElementById('edit_category_id').value = product.category_id;
 
@@ -948,6 +951,12 @@
                     <td>
                         <input type="number" class="form-control form-control-sm" value="${variant.count}" min="0" data-variant-id="${variant.id}">
                     </td>
+  <td>
+                        <input type="text" name="price" class="form-control form-control-sm" value="${variant.price}" min="0" data-variant-id="${variant.id}">
+                    </td>
+  <td>
+                        <input type="text" name="discount" class="form-control form-control-sm" value="${variant.discount}" min="0" data-variant-id="${variant.id}">
+                    </td>
                     <td class="text-center">
                         <button type="button" class="btn btn-primary btn-sm" onclick="updateVariant(${variant.id})">
                             <i class="bi bi-check-lg"></i> بروزرسانی
@@ -973,6 +982,8 @@
             const colorId = document.getElementById('inventory_color_id').value;
             const sizeId = document.getElementById('inventory_size_id').value;
             const count = parseInt(this.querySelector('input[name="count"]').value);
+            const price = parseInt(this.querySelector('input[name="price"]').value);
+            const discount = parseInt(this.querySelector('input[name="discount"]').value);
 
             if (!colorId || !sizeId || count < 0) {
                 alert('لطفاً رنگ، سایز و تعداد معتبر وارد کنید.');
@@ -989,7 +1000,9 @@
                     product_id: productId,
                     color_id: colorId,
                     size_id: sizeId,
-                    count: count
+                    count: count,
+                    price: price,
+                    discount: discount || null
                 })
             })
                 .then(response => response.json())
@@ -1006,8 +1019,14 @@
 
         // به‌روزرسانی موجودی یک ردیف
         function updateVariant(variantId) {
-            const input = document.querySelector(`input[data-variant-id="${variantId}"]`);
-            const newCount = parseInt(input.value);
+            const inputs = document.querySelectorAll(`input[data-variant-id="${variantId}"]`);
+            const countInput = [...inputs].find(i => i.name === 'count' || i.type === 'number');
+            const priceInput = [...inputs].find(i => i.name === 'price');
+            const discountInput = [...inputs].find(i => i.name === 'discount');
+
+            const newCount = parseInt(countInput.value);
+            const newPrice = parseInt(priceInput.value) || 0;
+            const newDiscount = parseInt(discountInput.value) || null;
 
             if (isNaN(newCount) || newCount < 0) {
                 alert('تعداد موجودی معتبر نیست.');
@@ -1020,7 +1039,11 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({ count: newCount })
+                body: JSON.stringify({
+                    count: newCount,
+                    price: newPrice,
+                    discount: newDiscount
+                })
             })
                 .then(response => response.json())
                 .then(data => {

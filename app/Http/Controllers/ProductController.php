@@ -102,10 +102,9 @@ class ProductController extends Controller
                 'unique:products,slug,' . $id,
             ],
 
-            'price' => 'required|numeric|min:0',
+
             'category_id' => 'required|exists:categories,id|not_in:0',
 
-            'discount' => 'nullable|numeric|min:0|lte:price',
             'meta_description' => 'required|string',
             'page_title' => 'required|string|max:255',
             'material' => 'required|string|max:255',
@@ -122,9 +121,7 @@ class ProductController extends Controller
             'slug.unique' => 'این اسلاگ قبلاً استفاده شده است.',
 
 
-            'price.required' => 'وارد کردن قیمت الزامی است.',
-            'price.numeric' => 'قیمت باید عدد معتبر باشد.',
-            'price.min' => 'قیمت نمی‌تواند منفی باشد.',
+
 
             'category_id.required' => 'انتخاب دسته‌بندی الزامی است.',
             'category_id.exists' => 'دسته‌بندی انتخاب‌شده معتبر نیست.',
@@ -132,9 +129,6 @@ class ProductController extends Controller
 
 
 
-            'discount.numeric' => 'میزان تخفیف باید عدد معتبر باشد.',
-            'discount.min' => 'میزان تخفیف نمی‌تواند منفی باشد.',
-            'discount.lte' => 'میزان تخفیف نمی‌تواند بیشتر از قیمت محصول باشد.',
 
             'meta_description.required' => 'وارد کردن توضیحات متا (Meta Description) الزامی است.',
 
@@ -155,7 +149,7 @@ class ProductController extends Controller
         $data = $request->all();
 
 
-        $data['discount'] = $request->filled('discount') ? $request->input('discount') : null;
+
         $product->update($data);
         return redirect()->back()->with('productMessage','محصول با موفقیت ویرایش شد.');
     }
@@ -340,6 +334,8 @@ class ProductController extends Controller
             'color_id'   => 'required|exists:product_colors,id',
             'size_id'    => 'required|exists:product_sizes,id',
             'count'      => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0|lte:price',
         ]);
 
         $variant = ProductVariant::updateOrCreate(
@@ -349,7 +345,9 @@ class ProductController extends Controller
                 'size_id'    => $request->size_id,
             ],
             [
-                'count' => DB::raw('count + ' . $request->count)
+                'count'    => $request->count,
+                'price'    => $request->price,
+                'discount' => $request->discount,
             ]
         );
 
@@ -364,10 +362,16 @@ class ProductController extends Controller
     public function updateVariant(Request $request, ProductVariant $variant): JsonResponse
     {
         $request->validate([
-            'count' => 'required|integer|min:0'
+            'count' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0|lte:price',
         ]);
 
-        $variant->update(['count' => $request->count]);
+        $variant->update([
+            'count' => $request->count,
+            'price'=>$request->price,
+            'discount'=>$request->discount
+        ]);
 
         return response()->json([
             'success' => true,

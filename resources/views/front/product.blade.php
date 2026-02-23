@@ -51,16 +51,22 @@
                     <h1 class="fw-bold mb-3">{{ $product->name }}</h1>
 
                     <!-- قیمت -->
-                    <div class="mb-4">
-                        @if($product->discount > 0)
+                    <div class="mb-4" id="product-price-box">
+                        @php
+                            $firstVariant = $product->variants->first();
+                            $price    = $firstVariant?->price ?? 0;
+                            $discount = $firstVariant?->discount ?? 0;
+                        @endphp
+
+                        @if($discount > 0)
                             <span class="text-muted text-decoration-line-through fs-4">
-                            {{ number_format($product->price) }} تومان
-                        </span>
+            {{ number_format($price) }} تومان
+        </span>
                             <span class="text-danger fw-bold fs-2 me-3">
-                            {{ number_format($product->price - $product->discount) }} تومان
-                        </span>
+            {{ number_format($price - $discount) }} تومان
+        </span>
                         @else
-                            <span class="fw-bold fs-2">{{ number_format($product->price) }} تومان</span>
+                            <span class="fw-bold fs-2">{{ number_format($price) }} تومان</span>
                         @endif
                     </div>
 
@@ -197,7 +203,14 @@
     </section>
 
     {{-- اسکریپت AJAX چک موجودی و افزودن به سبد --}}
-
+    <script id="variants-data-{{ $product->id }}" type="application/json">
+        {!! $product->variants->map(fn($v) => [
+            'color_id' => $v->color_id,
+            'size_id'  => $v->size_id,
+            'price'    => $v->price,
+            'discount' => $v->discount ?? 0,
+        ])->toJson() !!}
+    </script>
     <script>
 
 
@@ -236,6 +249,55 @@
                     });
             }
         }
+        function updateProductPagePrice() {
+            const productId = {{ $product->id }};
+            const colorId = parseInt(document.querySelector('input[name="color"]:checked')?.value);
+            const sizeId  = parseInt(document.querySelector('input[name="size"]:checked')?.value);
+
+            const el = document.getElementById('variants-data-' + productId);
+            if (!el) return;
+            const variants = JSON.parse(el.textContent);
+
+            let variant = null;
+            if (colorId && sizeId) {
+                variant = variants.find(v => v.color_id === colorId && v.size_id === sizeId);
+            }
+            if (!variant && colorId) {
+                variant = variants.find(v => v.color_id === colorId);
+            }
+            if (!variant) variant = variants[0];
+
+            if (!variant) return;
+
+            const fmt = n => Number(n).toLocaleString('en-US');
+            const box = document.getElementById('product-price-box');
+            const price = variant.price;
+            const discount = variant.discount || 0;
+
+            if (discount > 0) {
+                const pct = Math.round((discount / price) * 100);
+                box.innerHTML = `
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-danger">${pct}% تخفیف</span>
+                <span class="text-muted text-decoration-line-through fs-4">${fmt(price)} تومان</span>
+            </div>
+            <span class="text-danger fw-bold fs-2">${fmt(price - discount)} تومان</span>`;
+            } else {
+                box.innerHTML = `<span class="fw-bold fs-2">${fmt(price)} تومان</span>`;
+            }
+        }
+
+        document.querySelectorAll('input[name="color"], input[name="size"]').forEach(input => {
+            input.addEventListener('change', () => {
+                checkInstantStock();
+                updateProductPagePrice();
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkInstantStock();
+            updateProductPagePrice();
+        });
 
         // ۲. گوش دادن به تغییرات انتخاب رنگ و سایز
         document.querySelectorAll('input[name="color"], input[name="size"]').forEach(input => {

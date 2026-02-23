@@ -9,25 +9,7 @@
 @endsection
 
 @section('content')
-{{--    <section class="hero-new">
-        <div class="hero-container">
-            <img src="{{asset('video/'.$videoBanner->photo)}}" alt="Columbia Banner" class="hero-img">
-            <div class="hero-content-new">
 
-                <h1 style="font-size: 2em;" class="hero-main-title">فروشگاه لوازم خانگی افشار کالا</h1>
-                <p class="hero-description" style="font-size: 1.5em; font-weight: bold;">
-                   {{$videoBanner->title}}
-                </p>
-                <p class="hero-description">
-                    {{$videoBanner->description}}
-                </p>
-                <div class="hero-actions" style="margin-top: 20px;">
-                   --}}{{-- <a href="#" class="btn-black">خرید</a>--}}{{--
-                    <a href="{{$videoBanner->link}}" class="btn-black">{{$videoBanner->btn_text}}</a>
-                </div>
-            </div>
-        </div>
-    </section>--}}
 <section class="hero-new">
     <div class="hero-slider-container">
         <!-- اسلایدر با حداکثر 4 عکس -->
@@ -94,7 +76,7 @@
         <div class="product-scroll-container">
             <!-- همان محصولات جدیدترین، اما در پیشنهاد ویژه -->
 
-                @foreach($specials as $special)
+            {{--    @foreach($specials as $special)
                     <div class="col-lg-3 col-md-4 col-12">
                         <div class="product-item h-100 shadow-sm bg-white p-2 d-flex flex-column">
                             <div class="image-wrapper mb-2">
@@ -154,7 +136,127 @@
                         </div>
                     </div>
                 @endforeach
+--}}
+            @foreach($specials as $special)
+                @php
+                    // اولین variant که تخفیف داره، وگرنه اولین variant
+                    $defaultVariant = $special->variants->first(fn($v) => $v->discount > 0)
+                                    ?? $special->variants->first();
+                    $displayPrice    = $defaultVariant?->price ?? 0;
+                    $displayDiscount = $defaultVariant?->discount ?? 0;
+                @endphp
 
+                <div class="col-lg-3 col-md-4 col-12">
+                    <div class="product-item h-100 shadow-sm bg-white p-2 d-flex flex-column">
+
+                        <div class="image-wrapper mb-2">
+                            <a href="{{ route('front.product.show', $special->slug) }}">
+                                <img src="{{ asset('product/' . ($special->photos->first()->photo ?? 'placeholder.jpg')) }}"
+                                     class="main-product-img"
+                                     id="img-{{ $special->id }}"
+                                     alt="{{ $special->name }}">
+                            </a>
+                            @if($displayDiscount > 0)
+                                @php $percent = round(($displayDiscount / $displayPrice) * 100); @endphp
+                                <span class="promo-badge">{{ $percent }}% تخفیف</span>
+                            @endif
+                        </div>
+                        {{-- thumbnailهای عکس --}}
+                        @if($special->photos->count() > 1)
+                            <div class="color-swatches">
+                                @foreach($special->photos as $photo)
+                                    <div class="swatch {{ $loop->first ? 'active' : '' }}"
+                                         data-image="{{ asset('product/' . $photo->photo) }}"
+                                         onclick="changeProductImage(this, {{ $special->id }})">
+                                        <img src="{{ asset('product/' . $photo->photo) }}" alt="thumbnail">
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                        {{-- رنگ‌ها به صورت دایره --}}
+                        <div class="color-circles d-flex gap-1 flex-wrap mb-1"
+                             id="colors-{{ $special->id }}"
+                             data-product-id="{{ $special->id }}">
+                            @foreach($special->variants->pluck('color')->unique('id')->filter() as $color)
+                                <span class="color-circle {{ $loop->first ? 'active' : '' }}"
+                                      style="background-color: {{ $color->code }};"
+                                      title="{{ $color->name }}"
+                                      data-color-id="{{ $color->id }}"
+                                      data-product-id="{{ $special->id }}"
+                                      onclick="selectColor(this)">
+                    </span>
+                            @endforeach
+                        </div>
+
+                        {{-- سایزها --}}
+                        <div class="size-badges d-flex gap-1 flex-wrap mb-1"
+                             id="sizes-{{ $special->id }}">
+                            @foreach($special->variants->pluck('size')->unique('id')->filter() as $size)
+                                <span class="size-badge {{ $loop->first ? 'active' : '' }}"
+                                      data-size-id="{{ $size->id }}"
+                                      data-product-id="{{ $special->id }}"
+                                      onclick="selectSize(this)">
+                        {{ $size->name }}
+                    </span>
+                            @endforeach
+                        </div>
+
+                        <div class="product-details mt-2 flex-grow-1">
+                            <a href="{{ route('front.product.show', $special->slug) }}" class="text-decoration-none text-dark">
+                                <h3 class="product-name">{{ Str::limit($special->name, 40) }}</h3>
+                            </a>
+
+                            {{-- قیمت --}}
+                            <div class="price-box mt-2" id="price-box-{{ $special->id }}">
+                                @if($displayDiscount > 0)
+                                    @php $percent = round(($displayDiscount / $displayPrice) * 100); @endphp
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="badge bg-danger text-white" style="font-size:0.7rem;">{{ $percent }}% تخفیف</span>
+                                        <span class="old-price text-muted small text-decoration-line-through">{{ number_format($displayPrice) }}</span>
+                                    </div>
+                                    <span class="current-price text-danger fw-bold fs-5">
+                            {{ number_format($displayPrice - $displayDiscount) }}
+                            <small style="font-size:0.6em">تومان</small>
+                        </span>
+                                @elseif($displayPrice > 0)
+                                    <span class="current-price fw-bold fs-5">
+                            {{ number_format($displayPrice) }}
+                            <small style="font-size:0.6em">تومان</small>
+                        </span>
+                                @else
+                                    <span class="text-muted small">موجودی ندارد</span>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- داده‌های variants برای JS --}}
+                        @php
+                            $variantsJson = $special->variants->map(function($v) {
+                                return [
+                                    'color_id'   => $v->color_id,
+                                    'size_id'    => $v->size_id,
+                                    'price'      => $v->price,
+                                    'discount'   => $v->discount,
+                                    'count'      => $v->count,
+                                    'color_code' => optional($v->color)->code,
+                                    'color_name' => optional($v->color)->name,
+                                    'size_name'  => optional($v->size)->name,
+                                ];
+                            })->toJson();
+                        @endphp
+                        <script type="application/json" id="variants-data-{{ $special->id }}">
+                            {!! $variantsJson !!}
+                        </script>
+
+                        <div class="mt-3">
+                            <a href="{{ route('front.product.show', $special->slug) }}"
+                               class="btn btn-outline-primary btn-sm w-100 rounded-pill">
+                                مشاهده و خرید
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
             </div>
 
 
@@ -232,8 +334,17 @@
         <div class="product-scroll-container">
 
             @foreach($products as $product)
+                @php
+                    // اولین variant که تخفیف داره، وگرنه اولین variant
+                    $defaultVariant = $product->variants->first(fn($v) => $v->discount > 0)
+                                    ?? $product->variants->first();
+                    $displayPrice    = $defaultVariant?->price ?? 0;
+                    $displayDiscount = $defaultVariant?->discount ?? 0;
+                @endphp
+
                 <div class="col-lg-3 col-md-4 col-12">
                     <div class="product-item h-100 shadow-sm bg-white p-2 d-flex flex-column">
+
                         <div class="image-wrapper mb-2">
                             <a href="{{ route('front.product.show', $product->slug) }}">
                                 <img src="{{ asset('product/' . ($product->photos->first()->photo ?? 'placeholder.jpg')) }}"
@@ -241,24 +352,48 @@
                                      id="img-{{ $product->id }}"
                                      alt="{{ $product->name }}">
                             </a>
-
-                            @if($product->discount > 0)
-                                @php
-                                    $percent = round(($product->discount / $product->price) * 100);
-                                @endphp
+                            @if($displayDiscount > 0)
+                                @php $percent = round(($displayDiscount / $displayPrice) * 100); @endphp
                                 <span class="promo-badge">{{ $percent }}% تخفیف</span>
                             @endif
-
-
+                        </div>
+                        {{-- thumbnailهای عکس --}}
+                        @if($product->photos->count() > 1)
+                            <div class="color-swatches">
+                                @foreach($product->photos as $photo)
+                                    <div class="swatch {{ $loop->first ? 'active' : '' }}"
+                                         data-image="{{ asset('product/' . $photo->photo) }}"
+                                         onclick="changeProductImage(this, {{ $product->id }})">
+                                        <img src="{{ asset('product/' . $photo->photo) }}" alt="thumbnail">
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                        {{-- رنگ‌ها --}}
+                        <div class="color-circles d-flex gap-1 flex-wrap mb-1"
+                             id="colors-p{{ $product->id }}"
+                             data-product-id="p{{ $product->id }}">
+                            @foreach($product->variants->pluck('color')->unique('id')->filter() as $color)
+                                <span class="color-circle {{ $loop->first ? 'active' : '' }}"
+                                      style="background-color: {{ $color->code }};"
+                                      title="{{ $color->name }}"
+                                      data-color-id="{{ $color->id }}"
+                                      data-product-id="p{{ $product->id }}"
+                                      onclick="selectColor(this)">
+        </span>
+                            @endforeach
                         </div>
 
-                        <div class="color-swatches">
-                            @foreach($product->photos as $photo)
-                                <div class="swatch {{ $loop->first ? 'active' : '' }}"
-                                     data-image="{{ asset('product/' . $photo->photo) }}"
-                                     onclick="changeProductImage(this, 'img-{{ $product->id }}')">
-                                    <img src="{{ asset('product/' . $photo->photo) }}" alt="thumbnail">
-                                </div>
+                        {{-- سایزها --}}
+                        <div class="size-badges d-flex gap-1 flex-wrap mb-1"
+                             id="sizes-p{{ $product->id }}">
+                            @foreach($product->variants->pluck('size')->unique('id')->filter() as $size)
+                                <span class="size-badge {{ $loop->first ? 'active' : '' }}"
+                                      data-size-id="{{ $size->id }}"
+                                      data-product-id="p{{ $product->id }}"
+                                      onclick="selectSize(this)">
+            {{ $size->name }}
+        </span>
                             @endforeach
                         </div>
 
@@ -267,30 +402,58 @@
                                 <h3 class="product-name">{{ Str::limit($product->name, 40) }}</h3>
                             </a>
 
-                            <div class="price-box mt-2">
-                                @if($product->discount > 0)
-                                    @php
-                                        $percent = round(($product->discount / $product->price) * 100);
-                                    @endphp
+                            {{-- قیمت --}}
+                            <div class="price-box mt-2" id="price-box-p{{ $product->id }}">
+                                @if($displayDiscount > 0)
+                                    @php $percent = round(($displayDiscount / $displayPrice) * 100); @endphp
                                     <div class="d-flex align-items-center gap-2 mb-1">
-                                        <span class="badge bg-danger text-white" style="font-size: 0.7rem;">{{ $percent }}% تخفیف</span>
-                                        <span class="old-price text-muted small text-decoration-line-through">{{ number_format($product->price) }}</span>
+                                        <span class="badge bg-danger text-white" style="font-size:0.7rem;">{{ $percent }}% تخفیف</span>
+                                        <span class="old-price text-muted small text-decoration-line-through">{{ number_format($displayPrice) }}</span>
                                     </div>
-                                    <span class="current-price text-danger fw-bold fs-5">{{ number_format($product->price - $product->discount) }} <small style="font-size: 0.6em">تومان</small></span>
+                                    <span class="current-price text-danger fw-bold fs-5">
+                            {{ number_format($displayPrice - $displayDiscount) }}
+                            <small style="font-size:0.6em">تومان</small>
+                        </span>
+                                @elseif($displayPrice > 0)
+                                    <span class="current-price fw-bold fs-5">
+                            {{ number_format($displayPrice) }}
+                            <small style="font-size:0.6em">تومان</small>
+                        </span>
                                 @else
-                                    <span class="current-price fw-bold fs-5">{{ number_format($product->price) }} <small style="font-size: 0.6em">تومان</small></span>
+                                    <span class="text-muted small">موجودی ندارد</span>
                                 @endif
                             </div>
                         </div>
 
+                        {{-- داده‌های variants برای JS --}}
+                        @php
+                            $variantsJson = $product->variants->map(function($v) {
+                                return [
+                                    'color_id'   => $v->color_id,
+                                    'size_id'    => $v->size_id,
+                                    'price'      => $v->price,
+                                    'discount'   => $v->discount,
+                                    'count'      => $v->count,
+                                    'color_code' => optional($v->color)->code,
+                                    'color_name' => optional($v->color)->name,
+                                    'size_name'  => optional($v->size)->name,
+                                ];
+                            })->toJson();
+                        @endphp
+                        <script type="application/json" id="variants-data-p{{ $product->id }}">
+                            {!! $variantsJson !!}
+                        </script>
+
                         <div class="mt-3">
-                            <a href="{{ route('front.product.show', $product->slug) }}" class="btn btn-outline-primary btn-sm w-100 rounded-pill">
+                            <a href="{{ route('front.product.show', $product->slug) }}"
+                               class="btn btn-outline-primary btn-sm w-100 rounded-pill">
                                 مشاهده و خرید
                             </a>
                         </div>
                     </div>
                 </div>
             @endforeach
+
 
 
 

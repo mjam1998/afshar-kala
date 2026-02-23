@@ -28,16 +28,20 @@ class CheckoutController extends Controller
         foreach ($cart as $key => $item) {
             [$productId, $colorId, $sizeId] = explode('-', $key);
 
-            $product = Product::query()->find($productId);
-            if ($product) {
-                $price = $product->discount > 0
-                    ? $product->price - $product->discount
-                    : $product->price;
+            $variant = ProductVariant::where([
+                'product_id' => $productId,
+                'color_id'   => $colorId,
+                'size_id'    => $sizeId,
+            ])->first();
+
+            if ($variant) {
+                $price = $variant->discount > 0
+                    ? $variant->price - $variant->discount
+                    : $variant->price;
 
                 $totalAmount += $price * $item['quantity'];
             }
         }
-
         // دریافت اطلاعات کد تخفیف از session (اگر اعمال شده باشه)
         $appliedOffer = session('applied_offer');
         $offerDiscount = 0;
@@ -130,11 +134,10 @@ class CheckoutController extends Controller
             }
 
             // محاسبه قیمت واقعی از دیتابیس
-            $product = Product::findOrFail($productId);
-            $finalPrice = $product->discount > 0
-                ? $product->price - $product->discount
-                : $product->price;
-            $discount = $product->discount;
+            $finalPrice = $variant->discount > 0
+                ? $variant->price - $variant->discount
+                : $variant->price;
+            $discount = $variant->discount ?? 0;
             $totalAmount += $finalPrice * $item['quantity'];
             $totalDiscount += $discount * $item['quantity'];
 
@@ -199,13 +202,19 @@ class CheckoutController extends Controller
                 $product = Product::findOrFail($productId);
 
 
+                $variant = ProductVariant::where([
+                    'product_id' => $productId,
+                    'color_id'   => $colorId,
+                    'size_id'    => $sizeId,
+                ])->first();
+
                 OrderItem::query()->create([
                     'order_id' => $order->id,
                     'product_id' => $productId,
                     'product_color_id' => $colorId,
                     'product_size_id' => $sizeId,
-                    'price' => $product->price,
-                    'discount' => $product->discount,
+                    'price' => $variant->price,
+                    'discount' => $variant->discount ?? 0,
                     'quantity' => $item['quantity'],
                 ]);
 

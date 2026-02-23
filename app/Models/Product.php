@@ -11,8 +11,7 @@ class Product extends Model
         'category_id',
         'slug',
          'is_special',
-        'price',
-        'discount',
+
         'description',
         'material',
         'weight',

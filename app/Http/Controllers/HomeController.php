@@ -26,9 +26,10 @@ class HomeController extends Controller
         $banner4 = VideoBanner::where('sort', 4)->first();
 // محدود کردن عکس‌های محصولات به 4 تا
         $products = Product::query()
-            ->with(['photos' => function($query) {
-                $query->orderBy('id')->limit(4);
-            }])
+            ->with([
+                'photos' => fn($q) => $q->orderBy('id')->limit(4),
+                'variants' => fn($q) => $q->where('count', '>', 0)->with('color', 'size'),
+            ])
             ->orderBy('id', 'desc')
             ->take(12)
             ->get();
@@ -36,9 +37,10 @@ class HomeController extends Controller
         // محدود کردن عکس‌های محصولات ویژه به 4 تا
         $specials = Product::query()
             ->where('is_special', 1)
-            ->with(['photos' => function($query) {
-                $query->orderBy('id')->limit(4);
-            }])
+            ->with([
+                'photos' => fn($q) => $q->orderBy('id')->limit(4),
+                'variants' => fn($q) => $q->where('count', '>', 0)->with('color', 'size'),
+            ])
             ->orderBy('id', 'desc')
             ->take(12)
             ->get();
@@ -102,11 +104,17 @@ class HomeController extends Controller
         } else {
             $query->latest();
         }
-
-        // تغییر این خط - محدود کردن عکس‌ها به 4 تا
+        $products =$query
+            ->with([
+                'photos' => fn($q) => $q->orderBy('id')->limit(4),
+                'variants' => fn($q) => $q->where('count', '>', 0)->with('color', 'size'),
+            ])
+            ->orderBy('id', 'desc')
+            ->paginate(8);
+       /* // تغییر این خط - محدود کردن عکس‌ها به 4 تا
         $products = $query->with(['photos' => function($photoQuery) {
             $photoQuery->orderBy('id')->limit(4);
-        }])->paginate(8);
+        }])->paginate(8);*/
 
         return view('front.category', compact('category', 'products'));
     }
@@ -237,9 +245,9 @@ class HomeController extends Controller
             $cart[$key] = [
                 'product_id'   => $productId,
                 'product_name' => $product->name,
-                'price'        => $product->discount > 0
-                    ? $product->price - $product->discount
-                    : $product->price,
+                'price' => $variant->discount > 0
+                    ? $variant->price - $variant->discount
+                    : $variant->price,
                 'color_id'     => $colorId,
                 'color_name'   => $variant->color->name ?? 'نامشخص',
                 'color_code'   => $variant->color->code ?? '#000',
@@ -334,10 +342,13 @@ class HomeController extends Controller
             $query->latest();
         }
 
-        // تغییر این خط - محدود کردن عکس‌ها به 4 تا
-        $products = $query->with(['photos' => function($photoQuery) {
-            $photoQuery->orderBy('id')->limit(4);
-        }])->paginate(8);
+        $products =$query
+            ->with([
+                'photos' => fn($q) => $q->orderBy('id')->limit(4),
+                'variants' => fn($q) => $q->where('count', '>', 0)->with('color', 'size'),
+            ])
+            ->orderBy('id', 'desc')
+            ->paginate(8);
 
         return view('front.search', compact( 'products'));
     }

@@ -39,6 +39,38 @@
             margin: 0 !important;
             padding: 0 !important;
         }
+        /* در بخش <style> داخل <head> master اضافه کنید */
+        .color-circle {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .color-circle.active,
+        .color-circle:hover {
+            border-color: #333;
+            transform: scale(1.15);
+        }
+        .size-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background 0.2s, color 0.2s;
+            user-select: none;
+        }
+        .size-badge.active,
+        .size-badge:hover {
+            background: #333;
+            color: #fff;
+            border-color: #333;
+        }
+
     </style>
 </head>
 <body>
@@ -302,6 +334,61 @@
         swatches.forEach(s => s.classList.remove('active'));
         element.classList.add('active');
     }*/
+ function getVariants(productId) {
+     const el = document.getElementById('variants-data-' + productId);
+     return el ? JSON.parse(el.textContent) : [];
+ }
+
+ function updatePrice(productId) {
+     const variants = getVariants(productId);
+     const activeColor = document.querySelector(`#colors-${productId} .color-circle.active`);
+     const activeSize  = document.querySelector(`#sizes-${productId} .size-badge.active`);
+
+     const colorId = activeColor ? parseInt(activeColor.dataset.colorId) : null;
+     const sizeId  = activeSize  ? parseInt(activeSize.dataset.sizeId)   : null;
+
+     let variant = null;
+     if (colorId && sizeId) {
+         variant = variants.find(v => v.color_id === colorId && v.size_id === sizeId);
+     }
+     if (!variant && colorId) {
+         variant = variants.find(v => v.color_id === colorId);
+     }
+     if (!variant) variant = variants[0];
+
+     const box = document.getElementById('price-box-' + productId);
+     if (!box || !variant) return;
+
+     const fmt = (n) => Number(n).toLocaleString('en-US');
+
+     if (variant.discount > 0) {
+         const percent = Math.round((variant.discount / variant.price) * 100);
+         box.innerHTML = `
+           <div class="d-flex align-items-center gap-2 mb-1">
+               <span class="badge bg-danger text-white" style="font-size:0.7rem;">${percent}% تخفیف</span>
+               <span class="old-price text-muted small text-decoration-line-through">${fmt(variant.price)}</span>
+           </div>
+           <span class="current-price text-danger fw-bold fs-5">${fmt(variant.price - variant.discount)} <small style="font-size:0.6em">تومان</small></span>`;
+     } else {
+         box.innerHTML = `<span class="current-price fw-bold fs-5">${fmt(variant.price)} <small style="font-size:0.6em">تومان</small></span>`;
+     }
+ }
+
+
+ function selectColor(el) {
+     const productId = el.dataset.productId;
+     document.querySelectorAll(`#colors-${productId} .color-circle`).forEach(c => c.classList.remove('active'));
+     el.classList.add('active');
+     updatePrice(productId);
+ }
+
+ function selectSize(el) {
+     const productId = el.dataset.productId;
+     document.querySelectorAll(`#sizes-${productId} .size-badge`).forEach(s => s.classList.remove('active'));
+     el.classList.add('active');
+     updatePrice(productId);
+ }
+
  function changeProductImage(element, productId) {
      const newImageUrl = element.getAttribute('data-image');
 
