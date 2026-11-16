@@ -16,6 +16,7 @@ class VideoBanner extends Model
         'photo_alt',
         'link',
         'meta_description',
-        'page_title'
+        'page_title',
+        'sort',
     ];
 }

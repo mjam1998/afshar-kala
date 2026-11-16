@@ -26,6 +26,7 @@ class HomeController extends Controller
         $banner4 = VideoBanner::where('sort', 4)->first();
 // محدود کردن عکس‌های محصولات به 4 تا
         $products = Product::query()
+            ->where('is_active',true)
             ->with([
                 'photos' => fn($q) => $q->orderBy('id')->limit(4),
                 'variants' => fn($q) => $q->where('count', '>', 0)->with('color', 'size'),
@@ -36,6 +37,7 @@ class HomeController extends Controller
 
         // محدود کردن عکس‌های محصولات ویژه به 4 تا
         $specials = Product::query()
+            ->where('is_active',true)
             ->where('is_special', 1)
             ->with([
                 'photos' => fn($q) => $q->orderBy('id')->limit(4),
@@ -49,7 +51,7 @@ class HomeController extends Controller
       $bannerCenter=PhotoBanner::query()->where('id','3')->first();
         $bannerLeft=PhotoBanner::query()->where('id','4')->first();
         $bannerPrimary2=PhotoBanner::query()->where('id','5')->first();
-      $categories=Category::all();
+      $categories=Category::where('is_active',true)->get();
       $blogs=Blog::query()->orderBy('id','desc')->take(3)->get();
         return view('front.index',compact(
             'videoBanner','products','bannerPrimary',
@@ -79,7 +81,7 @@ class HomeController extends Controller
     {
         $category = Category::query()->where('slug', $slug)->firstOrFail();
 
-        $query = $category->products();
+        $query = $category->products()->where('is_active',true);
 
 
         if ($request->filled('search')) {
@@ -130,7 +132,8 @@ class HomeController extends Controller
 
 
 
-        ])->where('slug', $slug)->firstOrFail();
+        ])->where('slug', $slug)
+            ->where('is_active',true)->firstOrFail();
 
 
         $availableColors = $product->variants->pluck('color')->unique('id')->filter();
@@ -315,7 +318,7 @@ class HomeController extends Controller
     {
 
 
-        $query = Product::query();
+        $query = Product::query()->where('is_active',true);
 
 
         if ($request->filled('search')) {

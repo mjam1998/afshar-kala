@@ -20,8 +20,8 @@ class ProductController extends Controller
     public function index()
     {
 
-         $categories=Category::all();
-         return view('admin.product.index',compact('categories'));
+        $categories=Category::all();
+        return view('admin.product.index',compact('categories'));
     }
 
     public function store(Request $request)
@@ -34,10 +34,10 @@ class ProductController extends Controller
                 'unique:products,slug',
             ],
 
-            'price' => 'required|numeric|min:0',
+
             'category_id' => 'required|exists:categories,id|not_in:0',
 
-            'discount' => 'nullable|numeric|min:0|lte:price',
+
             'meta_description' => 'required|string',
             'page_title' => 'required|string|max:255',
             'material' => 'required|string|max:255',
@@ -53,9 +53,7 @@ class ProductController extends Controller
             'slug.unique' => 'این اسلاگ قبلاً استفاده شده است.',
 
 
-            'price.required' => 'وارد کردن قیمت الزامی است.',
-            'price.numeric' => 'قیمت باید عدد معتبر باشد.',
-            'price.min' => 'قیمت نمی‌تواند منفی باشد.',
+
 
             'category_id.required' => 'انتخاب دسته‌بندی الزامی است.',
             'category_id.exists' => 'دسته‌بندی انتخاب‌شده معتبر نیست.',
@@ -63,9 +61,7 @@ class ProductController extends Controller
 
 
 
-            'discount.numeric' => 'میزان تخفیف باید عدد معتبر باشد.',
-            'discount.min' => 'میزان تخفیف نمی‌تواند منفی باشد.',
-            'discount.lte' => 'میزان تخفیف نمی‌تواند بیشتر از قیمت محصول باشد.',
+
 
             'meta_description.required' => 'وارد کردن توضیحات متا (Meta Description) الزامی است.',
 
@@ -111,6 +107,8 @@ class ProductController extends Controller
             'weight' => 'required|string|max:100',
             'dimension' => 'required|string|max:100',
             'description' => 'required',
+            'is_active' => 'required|boolean',
+
         ], [
 
             'name.required' => 'وارد کردن نام الزامی است.',

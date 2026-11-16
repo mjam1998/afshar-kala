@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('category_id');
             $table->string('slug')->unique();
- $table->boolean('is_special')->default(false);
+            $table->boolean('is_special')->default(false);
             $table->decimal('price',15,0);
             $table->decimal('discount',15,0)->nullable();
             $table->text('description');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('dimension');
             $table->string('meta_description');
             $table->string('page_title');
-
+            $table->boolean('is_active')->default(true);
             $table->foreign('category_id')->references('id')->on('categories');
             $table->timestamps();
         });

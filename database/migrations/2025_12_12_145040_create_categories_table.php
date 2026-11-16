@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('meta_description');
             $table->string('photo_alt');
             $table->string('page_title');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

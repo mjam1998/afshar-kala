@@ -11,7 +11,7 @@ class Product extends Model
         'category_id',
         'slug',
          'is_special',
-
+        'is_active',
         'description',
         'material',
         'weight',
@@ -19,6 +19,11 @@ class Product extends Model
         'meta_description',
         'page_title',
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     public function category(){
         return $this->belongsTo(Category::class);
     }

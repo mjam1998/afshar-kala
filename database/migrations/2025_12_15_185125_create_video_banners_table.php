@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('photo_alt');
             $table->string('link')->nullable();
             $table->string('meta_description');
-
+            $table->tinyInteger('sort')->nullable();
             $table->string('page_title');
             $table->timestamps();
         });

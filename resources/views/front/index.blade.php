@@ -1,11 +1,11 @@
 @extends('front.layout.master')
 
 @section('page_title')
-    {{ $videoBanner->page_title ?? 'columbia' }}
+    {{ $videoBanner?->page_title ?? 'columbia' }}
 @endsection
 
 @section('meta_description')
-    {{$videoBanner->meta_description ?? 'columbia'}}
+    {{$videoBanner?->meta_description ?? 'columbia'}}
 @endsection
 
 @section('content')
@@ -17,7 +17,7 @@
             <div class="swiper-wrapper">
                 <!-- اسلاید 1 -->
                 <div class="swiper-slide">
-                  <a href="{{$videoBanner->link}}"> <img src="{{asset('video/'.$videoBanner->photo)}}" alt="Banner 1"></a>
+                  <a href="{{$videoBanner?->link  ?? '#'}}"> <img src="{{asset('video/'.$videoBanner?->photo)}}" alt="Banner 1"></a>
                 </div>
 
                 <!-- اسلاید 2 (در صورت وجود) -->
@@ -264,13 +264,13 @@
     </section>
     <section class="promo-banner">
         <div class="promo-bg">
-            <img src="{{asset('banner/'.$bannerPrimary->photo)}}"  alt="{{$bannerPrimary->photo_alt}}">
+            <img src="{{asset('banner/'.$bannerPrimary?->photo)}}"  alt="{{$bannerPrimary?->photo_alt}}">
         </div>
         <div class="promo-overlay"></div>
         <div class="promo-content">
-            <h1 class="promo-title">{{$bannerPrimary->title}}</h1>
-            <p style="font-size:1.2rem;">{{$bannerPrimary->description}}</p>
-            <a href="{{$bannerPrimary->link}}" class="btn-black " >مشاهده محصولات   </a>
+            <h1 class="promo-title">{{$bannerPrimary?->title}}</h1>
+            <p style="font-size:1.2rem;">{{$bannerPrimary?->description}}</p>
+            <a href="{{$bannerPrimary?->link}}" class="btn-black " >مشاهده محصولات   </a>
         </div>
     </section>
 
@@ -280,14 +280,14 @@
             <label class="blur-card">
                 <input type="checkbox">
                 <div class="card-media">
-                    <img src="{{asset('banner/'.$bannerRight->photo)}}" alt="{{$bannerRight->photo_alt}}">
+                    <img src="{{asset('banner/'.$bannerRight?->photo)}}" alt="{{$bannerRight?->photo_alt}}">
                 </div>
                 <div class="card-overlay">
                     <div class="overlay-text">
-                        <h3>{{$bannerRight->title}}</h3>
-                        <p>{{$bannerRight->description}}</p>
+                        <h3>{{$bannerRight?->title}}</h3>
+                        <p>{{$bannerRight?->description}}</p>
 
-                        <a style="text-decoration: none; color: white;" href="{{$bannerRight->link}}" class="view-btn">مشاهده محصولات</a>
+                        <a style="text-decoration: none; color: white;" href="{{$bannerRight?->link ?? '#'}}" class="view-btn">مشاهده محصولات</a>
                     </div>
                 </div>
             </label>
@@ -295,28 +295,28 @@
             <label class="blur-card">
                 <input type="checkbox">
                 <div class="card-media">
-                    <img src="{{asset('banner/'.$bannerCenter->photo)}}" alt="{{$bannerCenter->photo_alt}}">
+                    <img src="{{asset('banner/'.$bannerCenter?->photo)}}" alt="{{$bannerCenter?->photo_alt}}">
                 </div>
                 <div class="card-overlay">
                     <div class="overlay-text">
-                        <h3>{{$bannerCenter->title}}</h3>
-                        <p>{{$bannerCenter->description}}</p>
+                        <h3>{{$bannerCenter?->title}}</h3>
+                        <p>{{$bannerCenter?->description}}</p>
 
-                        <a style="text-decoration: none; color: white;" href="{{$bannerCenter->link}}" class="view-btn">مشاهده محصولات</a>
+                        <a style="text-decoration: none; color: white;" href="{{$bannerCenter?->link  ?? '#'}}" class="view-btn">مشاهده محصولات</a>
                     </div>
                 </div>
             </label>
             <label class="blur-card">
                 <input type="checkbox">
                 <div class="card-media">
-                    <img src="{{asset('banner/'.$bannerLeft->photo)}}" alt="{{$bannerLeft->photo_alt}}">
+                    <img src="{{asset('banner/'.$bannerLeft?->photo)}}" alt="{{$bannerLeft?->photo_alt}}">
                 </div>
                 <div class="card-overlay">
                     <div class="overlay-text">
-                        <h3>{{$bannerLeft->title}}</h3>
-                        <p>{{$bannerLeft->description}}</p>
+                        <h3>{{$bannerLeft?->title}}</h3>
+                        <p>{{$bannerLeft?->description}}</p>
 
-                        <a style="text-decoration: none; color: white;" href="{{$bannerLeft->link}}" class="view-btn">مشاهده محصولات</a>
+                        <a style="text-decoration: none; color: white;" href="{{$bannerLeft?->link ?? '#'}}" class="view-btn">مشاهده محصولات</a>
                     </div>
                 </div>
             </label>
@@ -461,13 +461,13 @@
     </section>
     <section class="promo-banner">
         <div class="promo-bg">
-            <img src="{{asset('banner/'.$bannerPrimary2->photo)}}"  alt="{{$bannerPrimary2->photo_alt}}">
+            <img src="{{asset('banner/'.$bannerPrimary2?->photo)}}"  alt="{{$bannerPrimary2?->photo_alt}}">
         </div>
         <div class="promo-overlay"></div>
         <div class="promo-content">
-            <h1 class="promo-title">{{$bannerPrimary2->title}}</h1>
-            <p style="font-size:1.2rem;">{{$bannerPrimary2->description}}</p>
-            <a href="{{$bannerPrimary2->link}}" class="btn-black " >مشاهده محصولات  </a>
+            <h1 class="promo-title">{{$bannerPrimary2?->title}}</h1>
+            <p style="font-size:1.2rem;">{{$bannerPrimary2?->description}}</p>
+            <a href="{{$bannerPrimary2?->link ?? '#'}}" class="btn-black " >مشاهده محصولات  </a>
         </div>
     </section>
 

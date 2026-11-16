@@ -23,6 +23,7 @@
                 <th class="text-center">اسلاگ</th>
                 <th class="text-center">نام</th>
                 <th class="text-center">دسته‌بندی</th>
+                <th class="text-center">وضعیت</th>
                 <th class="text-center">عملیات</th>
             </tr>
             </thead>
@@ -31,9 +32,19 @@
             @forelse($products as $product)
                 <tr>
                     <td class="text-center">{{ $product->slug }}</td>
-                    <td class="text-center">{{ $product->name }}</td>
+                    <td title="{{ $product->name }}" class="text-center">
+                        {{ \Illuminate\Support\Str::limit( $product->name, 25) }}
+                    </td>
+
+                    <td title="{{ $product->category?->name ?? '-'}}" class="text-center">
+                        {{ \Illuminate\Support\Str::limit( $product->category?->name ?? '-', 25) }}
+                    </td>
                     <td class="text-center">
-                        {{ $product->category?->name ?? '-' }}
+                        @if($product->is_active)
+                            <span class="badge bg-success">فعال</span>
+                        @else
+                            <span class="badge bg-danger">غیرفعال</span>
+                        @endif
                     </td>
                     <td style="text-align: center">
                         <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"

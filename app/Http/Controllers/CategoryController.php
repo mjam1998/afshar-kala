@@ -53,12 +53,12 @@ class CategoryController extends Controller
         $request->photo->storeAs('category', $photoName, 'public');
 
         Category::create([
-           'name'=>$request['name'],
-           'slug'=>$request['slug'],
-           'photo'=>$photoName,
-           'photo_alt'=>$request['photo_alt'],
-           'meta_description'=>$request['meta_description'],
-           'page_title'=>$request['page_title'],
+            'name'=>$request['name'],
+            'slug'=>$request['slug'],
+            'photo'=>$photoName,
+            'photo_alt'=>$request['photo_alt'],
+            'meta_description'=>$request['meta_description'],
+            'page_title'=>$request['page_title'],
         ]);
 
         return redirect()->back()->with('categoryAdded','دسته بندی با موفقیت افزوده شد.');
@@ -79,6 +79,7 @@ class CategoryController extends Controller
             'photo_alt'=>'required|string',
             'meta_description'=>'required|string',
             'page_title'=>'required|string',
+            'is_active' => 'required|boolean',
         ], [
             'slug.regex'   => 'اسلاگ فقط می‌تواند حروف انگلیسی کوچک (a-z) و عدد باشد.  خط تیره، فاصله یا کاراکتر خاص مجاز نیست.',
             'slug.unique'  => 'این اسلاگ قبلاً استفاده شده است.',

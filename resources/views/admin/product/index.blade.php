@@ -94,6 +94,14 @@
                                 <label>Page Title</label>
                                 <input type="text" name="page_title" id="edit_page_title" class="form-control" required>
                             </div>
+                            <div class="col-md-4">
+                                <label class="control-label">وضعیت</label>
+                                <select name="is_active" class="form-control mt-2" id="edit_is_active">
+                                    <option value="1">فعال</option>
+                                    <option value="0">غیرفعال</option>
+                                </select>
+                            </div>
+
                             <div>
                                 <label>توضیحات محصول</label>
                                 <textarea name="description" id="edit_description" class="form-control" ></textarea>
@@ -397,7 +405,9 @@
             });
 
             // ادیتور فرم ایجاد محصول
-            const mainTextarea = document.querySelector('textarea[name="description"]');
+            // ادیتور فرم ایجاد محصول (فقط اگر خارج از مودال باشد)
+            const mainTextarea = document.querySelector('textarea[name="description"]:not(#edit_description)');
+
             if (mainTextarea) {
                 ClassicEditor
                     .create(mainTextarea, {
@@ -418,6 +428,7 @@
             document.getElementById('edit_slug').value = product.slug;
             document.getElementById('edit_is_special').value = product.is_special;
 
+            document.getElementById('edit_is_active').value = product.is_active ? '1' : '0';
 
 
             document.getElementById('edit_category_id').value = product.category_id;

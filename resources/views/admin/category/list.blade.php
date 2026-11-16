@@ -97,13 +97,14 @@
 
                 </form>
             </div>
-            <div class="table-container  " style="margin-top: 50px;">
+            <div class="table-responsive" style="margin-top: 50px;">
                 <table id="datatable" class=" table table-hover table-bordered mt-3  mb-3  ">
                     <thead >
                     <tr  >
                         <th style="text-align: center">اسلاگ</th>
                         <th style="text-align: center">نام</th>
                         <th style="text-align: center">عکس</th>
+                        <th class="text-center">وضعیت</th>
                         <th style="text-align: center">عملیات</th>
                     </tr>
                     </thead>
@@ -111,8 +112,18 @@
                     @foreach($categories as $category)
                         <tr >
                             <td style="text-align: center">{{$category->slug}}</td>
-                            <td style="text-align: center">{{$category->name}}</td>
+
+                            <td title="{{ $category->name }}" class="text-center">
+                                {{ \Illuminate\Support\Str::limit( $category->name, 25) }}
+                            </td>
                             <td style="text-align: center"><img src="{{asset('category/'.$category->photo)}}" style="width: 80px; height: 80px;"></td>
+                            <td class="text-center">
+                                @if($category->is_active)
+                                    <span class="badge bg-success">فعال</span>
+                                @else
+                                    <span class="badge bg-danger">غیرفعال</span>
+                                @endif
+                            </td>
                             <td style="text-align: center">
                                 <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#editModal"
@@ -175,6 +186,16 @@
                                 <label>عنوان صفحه</label>
                                 <input type="text" name="page_title" id="edit_page_title" class="form-control" required>
                             </div>
+
+                            <div class="col-md-6">
+                                <label>وضعیت</label>
+                                <select name="is_active" id="edit_is_active" class="form-control" required>
+                                    <option value="1">فعال</option>
+                                    <option value="0">غیرفعال</option>
+                                </select>
+                                <span>با تغییر وضعیت یک دسته بندی تمام محصولات زیر شاخه ان هم تغییر میکند</span>
+                            </div>
+
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -198,6 +219,8 @@
             document.getElementById('edit_meta_description').value = category.meta_description;
             document.getElementById('edit_page_title').value = category.page_title;
             document.getElementById('current_photo').src = `/category/${category.photo}`;
+            document.getElementById('edit_is_active').value = category.is_active ? '1' : '0';
+
         }
     </script>
 @endsection

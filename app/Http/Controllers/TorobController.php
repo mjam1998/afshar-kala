@@ -46,10 +46,10 @@ class TorobController extends Controller
                     : null;
 
                 $result[] = [
-                    'torob_id'     => $product->id . '-' . $variant->id,
+                    'torob_id'     => $product->id,
                     'title'        => $product->name . ' - ' . $variant->color->name . ' - ' . $variant->size->name,
-                    'price'     => (int) $finalPrice * 10,
-                    'old_price' => $oldPrice ? (int) $oldPrice * 10 : null,
+                    'price'     => (int) $finalPrice ,
+                    'old_price' => $oldPrice ? (int) $oldPrice  : null,
                     'availability' => $variant->count > 0,
                     'image_link'   => $imageUrl,
                     'product_link' => route('front.product.show', $product->slug),
@@ -104,10 +104,10 @@ class TorobController extends Controller
             : null;
 
         return response()->json([
-            'torob_id'     => $product->id . '-' . $variant->id,
+            'torob_id'     => $product->id,
             'title'        => $product->name . ' - ' . $variant->color->name . ' - ' . $variant->size->name,
-            'price'     => (int) $finalPrice * 10,
-            'old_price' => $oldPrice ? (int) $oldPrice * 10 : null,
+            'price'     => (int) $finalPrice ,
+            'old_price' => $oldPrice ? (int) $oldPrice  : null,
             'availability' => $variant->count > 0,
             'image_link'   => $imageUrl,
             'product_link' => route('front.product.show', $product->slug),
