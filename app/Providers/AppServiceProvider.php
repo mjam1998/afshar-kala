@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
-        $categories = Category::all();
+        $categories = Category::where('is_active',true)->get();
         View::share('menuCategories', $categories);
 
         Paginator::useBootstrapFive();
